@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package example;
+option go_package = "github.com/xxarupakaxx/grpc-example/pb";
+
+service MatchingService {
+  rpc MatchStreams (stream MatchRequest) returns (stream MatchResponse);
+}
+
+message MatchRequest {
+}
+
+message MatchResponse {
+  int32 matchID = 1;
+  enum Status {
+    UNKNOWN = 0;
+    WAITING = 1;
+    MATCH = 2;
+  }
+
+  Status status = 2;
+  int32 playerID = 3;
+}
+
