@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package example;
+option go_package = "github.com/xxarupakaxx/grpc-example/pb";
+
+service GameService {
+  rpc Play(stream PlayRequest) returns (stream PlayResponse);
+}
+
+message PlayRequest {
+  int32 roomID = 1;
+  Player player = 2;
+
+  oneof Action {
+    StartAction start = 3;
+    PlayAction playing = 4;
+  }
+
+  message StartAction {}
+  message PlayAction {
+    int32 placeNumber = 1;
+  }
+}
+
+message PlayResponse {
+  oneof Event {
+    ReadyEvent ready = 1;
+    PlayEvent play = 2;
+    FinishEvent finish = 3;
+  }
+
+  message ReadyEvent {}
+  message PlayEvent {
+    Player player = 1;
+    Board board = 2;
+  }
+
+  message FinishEvent {
+    Result result = 1;
+    Board board = 2;
+  }
+}
+
+message Player {
+  int32 playerID = 1;
+  Piece piece = 2;
+}
+
+message Piece {
+  enum XO {
+    X = 0;
+    Y = 1;
+  }
+  XO xo = 1;
+}
+enum Result {
+  DRAW = 0;
+  LOSE = 1;
+  WIN = 2;
+}
+
+message Board {
+  repeated Piece pieces = 1;
+}
