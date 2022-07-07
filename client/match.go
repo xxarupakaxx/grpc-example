@@ -3,9 +3,17 @@ package client
 import (
 	"context"
 	"fmt"
+	"github.com/xxarupakaxx/grpc-example/game"
 	"github.com/xxarupakaxx/grpc-example/gen/pb"
+	"sync"
 )
 
+type Game struct {
+	sync.RWMutex
+	me       *game.Player
+	room     *game.Room
+	game     *game.Board
+}
 func MatchingGame(c pb.MatchingServiceClient) error {
 	stream, err := c.MatchStreams(context.Background())
 	if err != nil {
