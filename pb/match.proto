@@ -11,7 +11,7 @@ message MatchRequest {
 }
 
 message MatchResponse {
-  int32 matchID = 1;
+  int32 roomID = 1;
   enum Status {
     UNKNOWN = 0;
     WAITING = 1;
