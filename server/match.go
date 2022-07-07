@@ -4,6 +4,7 @@ import (
 	"github.com/xxarupakaxx/grpc-example/game"
 	"github.com/xxarupakaxx/grpc-example/gen/pb"
 	"sync"
+	"time"
 )
 
 type MatchService struct {
@@ -19,9 +20,8 @@ func NewMatchService() *MatchService {
 var count = 0
 
 func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer) error {
-
 	m.Lock()
-	defer m.Unlock()
+
 	count++
 	player := &game.Player{
 		PlayerID: count,
@@ -37,14 +37,13 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 				Status:   pb.MatchResponse_WAITING,
 				PlayerID: int32(count),
 			})
-
 			if err != nil {
 				return err
 			}
+			m.Unlock()
 
 			return nil
 		}
-
 	}
 
 	player.Piece = game.O
@@ -56,6 +55,7 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 	}
 
 	m.Room[r.RoomID] = r
+	m.Unlock()
 
 	err := stream.Send(&pb.MatchResponse{
 		RoomID:   int32(maxRoomID),
@@ -66,9 +66,10 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 		return err
 	}
 
-	go func() {
+	ch := make(chan struct{})
+	go func(ch chan<- struct{}) {
 		for true {
-			m.RLock()
+			m.Lock()
 			player2 := r.Player2
 			m.Unlock()
 			if player2 != nil {
@@ -80,9 +81,17 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 				if err != nil {
 					return
 				}
+				ch <- struct{}{}
+				break
 			}
+			time.Sleep(5 * time.Second)
 		}
-	}()
+	}(ch)
+
+	select {
+	case <-ch:
+
+	}
 
 	return nil
 }

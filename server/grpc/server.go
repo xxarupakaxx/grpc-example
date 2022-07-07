@@ -1,9 +1,10 @@
-package server
+package main
 
 import (
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/sirupsen/logrus"
 	"github.com/xxarupakaxx/grpc-example/gen/pb"
+	"github.com/xxarupakaxx/grpc-example/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
@@ -21,17 +22,17 @@ func main() {
 	logusLogger := logrus.New()
 	logrusEnty := logrus.NewEntry(logusLogger)
 	grpc_logrus.ReplaceGrpcLogger(logrusEnty)
-	server := grpc.NewServer(
+	s := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_logrus.UnaryServerInterceptor(logrusEnty)))
 
-	pb.RegisterMatchingServiceServer(server, NewMatchService())
+	pb.RegisterMatchingServiceServer(s, server.NewMatchService())
 
-	reflection.Register(server)
+	reflection.Register(s)
 
 	go func() {
 		log.Println("start grpc server ")
 
-		if err = server.Serve(lis); err != nil {
+		if err = s.Serve(lis); err != nil {
 			log.Println("failed to start server")
 		}
 	}()
@@ -40,5 +41,5 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("stopping grpc server")
-	server.GracefulStop()
+	s.GracefulStop()
 }
