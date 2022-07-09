@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/xxarupakaxx/grpc-example/game"
+	"github.com/xxarupakaxx/grpc-example/game/utils"
 	"github.com/xxarupakaxx/grpc-example/gen/pb"
 	"sync"
 	"time"
@@ -33,9 +34,9 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 			room.Player2 = player
 
 			err := stream.Send(&pb.MatchResponse{
-				RoomID:   int32(room.RoomID),
-				Status:   pb.MatchResponse_WAITING,
-				PlayerID: int32(count),
+				RoomID: int32(room.RoomID),
+				Status: pb.MatchResponse_WAITING,
+				Player: utils.ConvertToPbPlayer(player),
 			})
 			if err != nil {
 				return err
@@ -58,9 +59,9 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 	m.Unlock()
 
 	err := stream.Send(&pb.MatchResponse{
-		RoomID:   int32(maxRoomID),
-		Status:   pb.MatchResponse_WAITING,
-		PlayerID: int32(player.PlayerID),
+		RoomID: int32(maxRoomID),
+		Status: pb.MatchResponse_WAITING,
+		Player: utils.ConvertToPbPlayer(player),
 	})
 	if err != nil {
 		return err
@@ -74,9 +75,9 @@ func (m *MatchService) MatchStreams(stream pb.MatchingService_MatchStreamsServer
 			m.Unlock()
 			if player2 != nil {
 				err = stream.Send(&pb.MatchResponse{
-					RoomID:   int32(r.RoomID),
-					Status:   pb.MatchResponse_MATCH,
-					PlayerID: int32(player.PlayerID),
+					RoomID: int32(r.RoomID),
+					Status: pb.MatchResponse_MATCH,
+					Player: utils.ConvertToPbPlayer(player),
 				})
 				if err != nil {
 					return

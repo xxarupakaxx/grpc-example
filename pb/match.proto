@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package example;
 option go_package = "github.com/xxarupakaxx/grpc-example/pb";
+import "pb/player.proto";
 
 service MatchingService {
   rpc MatchStreams (stream MatchRequest) returns (stream MatchResponse);
@@ -19,6 +20,6 @@ message MatchResponse {
   }
 
   Status status = 2;
-  int32 playerID = 3;
+  Player player = 3;
 }
 
