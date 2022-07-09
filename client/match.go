@@ -4,17 +4,19 @@ import (
 	"context"
 	"fmt"
 	"github.com/xxarupakaxx/grpc-example/game"
+	"github.com/xxarupakaxx/grpc-example/game/utils"
 	"github.com/xxarupakaxx/grpc-example/gen/pb"
 	"sync"
 )
 
 type Game struct {
 	sync.RWMutex
-	me       *game.Player
-	room     *game.Room
-	game     *game.Board
+	me   *game.Player
+	room *game.Room
+	game *game.Board
 }
-func MatchingGame(c pb.MatchingServiceClient) error {
+
+func (g *Game) MatchingGame(c pb.MatchingServiceClient) error {
 	stream, err := c.MatchStreams(context.Background())
 	if err != nil {
 		return err
@@ -32,6 +34,7 @@ func MatchingGame(c pb.MatchingServiceClient) error {
 			fmt.Println("マッチング相手を探している")
 		}
 		if res.GetStatus() == pb.MatchResponse_MATCH {
+			g.me = utils.ConvertToGamePlayer(res.GetPlayer())
 			fmt.Println("マッチング相手が見つかりました")
 			return nil
 		}
