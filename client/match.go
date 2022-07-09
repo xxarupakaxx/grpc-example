@@ -16,6 +16,10 @@ type Game struct {
 	game *game.Board
 }
 
+func NewGame() *Game {
+	return &Game{}
+}
+
 func (g *Game) MatchingGame(c pb.MatchingServiceClient) error {
 	stream, err := c.MatchStreams(context.Background())
 	if err != nil {
