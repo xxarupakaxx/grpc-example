@@ -14,7 +14,6 @@ type MatchService struct {
 }
 
 func NewMatchService() *MatchService {
-
 	return &MatchService{Room: make(map[int]*game.Room)}
 }
 
