@@ -41,3 +41,27 @@ func ConvertToPbPlayer(player *game.Player) *pb.Player {
 		Piece:    ConvertToPbPiece(player.Piece),
 	}
 }
+
+func ConvertToPbBoard(board *game.Board) *pb.Board {
+	xos := make([]*pb.Piece, 0, 10)
+
+	for _, xo := range board.Line {
+		xos = append(xos, ConvertToPbPiece(xo))
+	}
+
+	return &pb.Board{
+		Pieces: xos,
+	}
+}
+
+func ConvertToPbResult(result game.Result) pb.Result {
+	switch result {
+	case game.WINNER:
+		return pb.Result_WIN
+	case game.LOSE:
+		return pb.Result_LOSE
+	case game.DRAW:
+		return pb.Result_DRAW
+	}
+	return  0
+}
