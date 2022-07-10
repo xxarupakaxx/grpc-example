@@ -26,6 +26,7 @@ func main() {
 		grpc.UnaryInterceptor(grpc_logrus.UnaryServerInterceptor(logrusEnty)))
 
 	pb.RegisterMatchingServiceServer(s, server.NewMatchService())
+	pb.RegisterGameServiceServer(s, server.NewGameService())
 
 	reflection.Register(s)
 
